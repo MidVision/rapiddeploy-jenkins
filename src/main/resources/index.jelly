@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <div>
-  This plugin allows you to build deployment packages and request deployments on a RapidDeploy server.
+  Allows Jenkins users to use the RapidDeploy functionality on a Jenkins job or pipeline.
 </div>

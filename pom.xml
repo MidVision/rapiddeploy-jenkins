@@ -3,66 +3,24 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>1.509.1</version><!-- which version of Jenkins is this plugin built against? -->
+		<version>2.3</version>
 	</parent>
 
+	<name>RapidDeploy Plugin</name>
+	<description>Allows Jenkins users to use the RapidDeploy functionality on a Jenkins job or pipeline.</description>
 	<artifactId>rapiddeploy-jenkins</artifactId>
-	<version>3.10-SNAPSHOT</version>
+	<version>4.1-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 
-	<!-- This is necessary because https://maven.jenkins-ci.org does't work anymore,
-		so we need to overwrite the repositories as per Jenkins documentation.-->
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>maven.jenkins-ci.org</id>
-			<url>https://repo.jenkins-ci.org/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>maven.jenkins-ci.org</id>
-			<url>https://repo.jenkins-ci.org/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
+	<url>https://wiki.jenkins-ci.org/display/JENKINS/RapidDeploy+Plugin</url>
 
-	<!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
-	<repositories>
-		<repository>
-			<id>repo.jenkins-ci.org</id>
-			<url>https://repo.jenkins-ci.org/public/</url>
-		</repository>
-		<repository>
+	<developers>
+		<developer>
 			<id>MidVision</id>
-			<url>http://www.download.midvision.com/content/repositories/Community_release/</url>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>repo.jenkins-ci.org</id>
-			<url>https://repo.jenkins-ci.org/public/</url>
-		</pluginRepository>
-	</pluginRepositories>
-
-	<dependencies>
-		<dependency>
-			<groupId>com.midvision.plugins</groupId>
-			<artifactId>rapiddeploy-connector</artifactId>
-			<version>1.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.3.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-
-	<properties>
-		<!-- explicitly specifying the latest version here because one we get from the parent POM tends to lag behind a bit -->
-		<maven-hpi-plugin.version>1.95</maven-hpi-plugin.version>
-		<maven-release-plugin.version>2.5</maven-release-plugin.version>
-	</properties>
+			<name>MidVision</name>
+			<email>support@midvision.com</email>
+		</developer>
+	</developers>
 
 	<scm>
 		<connection>scm:git:ssh://github.com/jenkinsci/rapiddeploy-plugin.git</connection>
@@ -71,7 +29,24 @@
 		<tag>HEAD</tag>
 	</scm>
 
-	<url>https://wiki.jenkins-ci.org/display/JENKINS/RapidDeploy+plugin</url>
+	<properties>
+		<workflow.version>1.13</workflow.version>
+<!-- 		<jenkins.version>2.0</jenkins.version> -->
+		<jenkins-test-harness.version>2.48</jenkins-test-harness.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.midvision.plugins</groupId>
+			<artifactId>rapiddeploy-connector</artifactId>
+			<version>1.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-cps</artifactId>
+			<version>${workflow.version}</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -91,11 +66,36 @@
 		</plugins>
 	</build>
 
-	<developers>
-		<developer>
+	<!-- This is necessary because https://maven.jenkins-ci.org does't work 
+		anymore, so we need to overwrite the repositories as per Jenkins documentation. -->
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>maven.jenkins-ci.org</id>
+			<url>https://repo.jenkins-ci.org/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>maven.jenkins-ci.org</id>
+			<url>https://repo.jenkins-ci.org/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<!-- Get every artifact through repo.jenkins-ci.org, which proxies all the 
+		artifacts that we need. -->
+	<repositories>
+		<repository>
+			<id>repo.jenkins-ci.org</id>
+			<url>https://repo.jenkins-ci.org/public/</url>
+		</repository>
+		<repository>
 			<id>MidVision</id>
-			<name>MidVision</name>
-			<email>support@midvision.com</email>
-		</developer>
-	</developers>
+			<url>http://www.download.midvision.com/content/repositories/Community_release/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>repo.jenkins-ci.org</id>
+			<url>https://repo.jenkins-ci.org/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
