@@ -58,8 +58,7 @@ def call(args = [:]) {
 					println "Job running, next check in 30 seconds..."
 					milisToSleep = 30000L
 				} else if ((jobStatus.equals("REQUESTED")) || (jobStatus.equals("REQUESTED_SCHEDULED"))) {
-					println "Job in a REQUESTED state. Approval may be required in RapidDeploy "
-					+ "to continue with the execution, next check in 30 seconds..."
+					println "Job in a REQUESTED state. Approval may be required in RapidDeploy to continue with the execution, next check in 30 seconds..."
 				} else if (jobStatus.equals("SCHEDULED")) {
 					println "Job in a SCHEDULED state, the execution will start in a future date, next check in 5 minutes..."
 					println "Printing out job details: "

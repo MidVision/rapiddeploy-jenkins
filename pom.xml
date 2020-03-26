@@ -9,7 +9,7 @@
 	<name>RapidDeploy Plugin</name>
 	<description>Allows Jenkins users to use the RapidDeploy functionality on a Jenkins job or pipeline.</description>
 	<artifactId>rapiddeploy-jenkins</artifactId>
-	<version>4.1-SNAPSHOT</version>
+	<version>4.4-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 
 	<url>https://wiki.jenkins-ci.org/display/JENKINS/RapidDeploy+Plugin</url>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.midvision.plugins</groupId>
 			<artifactId>rapiddeploy-connector</artifactId>
-			<version>1.9</version>
+			<version>1.10</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jenkins-ci.plugins.workflow</groupId>

@@ -7,8 +7,10 @@ import javax.servlet.ServletException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.midvision.rapiddeploy.plugin.jenkins.RapidDeployConnectorProxy;
 
@@ -17,6 +19,7 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Item;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
@@ -82,15 +85,10 @@ public class RapidDeployJobRunner extends Notifier {
 	}
 
 	/**
-	 * Descriptor for {@link RapidDeployJobRunner}. Used as a singleton. The
-	 * class is marked as public so that it can be accessed from views.
+	 * Descriptor for {@link RapidDeployJobRunner}. Used as a singleton. The class is marked as public so that it can be accessed from views.
 	 */
 	@Extension
 	public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-
-		final private static String NOT_EMPTY_MESSAGE = "Please set a value for this field!";
-		final private static String NO_PROTOCOL_MESSAGE = "Please specify a protocol for the URL, e.g. \"http://\".";
-		final private static String CONNECTION_BAD_MESSAGE = "Unable to establish connection.";
 
 		final private RapidDeployConnectorProxy rdProxy = new RapidDeployConnectorProxy();
 
@@ -116,95 +114,133 @@ public class RapidDeployJobRunner extends Notifier {
 		}
 
 		/** SERVER URL FIELD **/
-
-		public FormValidation doCheckServerUrl(@QueryParameter final String value) throws IOException, ServletException {
+		@RequirePOST
+		public FormValidation doCheckServerUrl(@QueryParameter final String value, @AncestorInPath Item item) throws IOException, ServletException {
 			logger.debug("doCheckServerUrl");
+			if (item == null) {
+				return FormValidation.ok();
+			}
+			if (!item.hasPermission(Item.CONFIGURE)) {
+				return FormValidation.warning(RapidDeployConnectorProxy.INSUFFICIENT_PERMISSIONS_MESSAGE);
+			}
 			rdProxy.setNewConnection(true);
 			if (value.length() == 0) {
-				return FormValidation.error(NOT_EMPTY_MESSAGE);
+				return FormValidation.error(RapidDeployConnectorProxy.NOT_EMPTY_MESSAGE);
 			} else if (!value.startsWith("http://") && !value.startsWith("https://")) {
-				return FormValidation.warning(NO_PROTOCOL_MESSAGE);
+				return FormValidation.warning(RapidDeployConnectorProxy.NO_PROTOCOL_MESSAGE);
 			}
 			return FormValidation.ok();
 		}
 
 		/** AUTHENTICATION TOKEN FIELD **/
-
-		public FormValidation doCheckAuthenticationToken(@QueryParameter final String value) throws IOException, ServletException {
+		@RequirePOST
+		public FormValidation doCheckAuthenticationToken(@QueryParameter final String value, @AncestorInPath Item item) throws IOException, ServletException {
 			logger.debug("doCheckAuthenticationToken");
+			if (item == null) {
+				return FormValidation.ok();
+			}
+			if (!item.hasPermission(Item.CONFIGURE)) {
+				return FormValidation.warning(RapidDeployConnectorProxy.INSUFFICIENT_PERMISSIONS_MESSAGE);
+			}
 			rdProxy.setNewConnection(true);
 			if (value.length() == 0) {
-				return FormValidation.error(NOT_EMPTY_MESSAGE);
+				return FormValidation.error(RapidDeployConnectorProxy.NOT_EMPTY_MESSAGE);
 			}
 			return FormValidation.ok();
 		}
 
 		/** LOAD PROJECTS BUTTON **/
-
+		@RequirePOST
 		public FormValidation doLoadProjects(@QueryParameter("serverUrl") final String serverUrl,
-				@QueryParameter("authenticationToken") final String authenticationToken) throws IOException, ServletException {
+				@QueryParameter("authenticationToken") final String authenticationToken, @AncestorInPath Item item) throws IOException, ServletException {
 			logger.debug("doLoadProjects");
+			if (item == null) {
+				return FormValidation.ok();
+			}
+			if (!item.hasPermission(Item.CONFIGURE)) {
+				return FormValidation.warning(RapidDeployConnectorProxy.INSUFFICIENT_PERMISSIONS_MESSAGE);
+			}
 			rdProxy.setNewConnection(true);
 			if (rdProxy.getProjects(serverUrl, authenticationToken).isEmpty()) {
-				return FormValidation.error(CONNECTION_BAD_MESSAGE);
+				return FormValidation.error(RapidDeployConnectorProxy.CONNECTION_BAD_MESSAGE);
 			}
 			return FormValidation.ok();
 		}
 
 		/** PROJECT FIELD **/
-
+		@RequirePOST
 		public ListBoxModel doFillProjectItems(@QueryParameter("serverUrl") final String serverUrl,
-				@QueryParameter("authenticationToken") final String authenticationToken) {
+				@QueryParameter("authenticationToken") final String authenticationToken, @AncestorInPath Item item) {
 			logger.debug("doFillProjectItems");
-			final ListBoxModel items = new ListBoxModel();
-			for (final String projectName : rdProxy.getProjects(serverUrl, authenticationToken)) {
-				items.add(projectName);
+			final ListBoxModel listBoxItems = new ListBoxModel();
+			if (item == null) {
+				return listBoxItems;
 			}
-			return items;
+			if (!item.hasPermission(Item.CONFIGURE)) {
+				return listBoxItems.add("No items retrieved. " + RapidDeployConnectorProxy.INSUFFICIENT_PERMISSIONS_MESSAGE);
+			}
+			for (final String projectName : rdProxy.getProjects(serverUrl, authenticationToken)) {
+				listBoxItems.add(projectName);
+			}
+			return listBoxItems;
 		}
 
 		/** TARGET FIELD **/
-
+		@RequirePOST
 		public ListBoxModel doFillTargetItems(@QueryParameter("serverUrl") final String serverUrl,
-				@QueryParameter("authenticationToken") final String authenticationToken, @QueryParameter("project") final String project) {
+				@QueryParameter("authenticationToken") final String authenticationToken, @QueryParameter("project") final String project,
+				@AncestorInPath Item item) {
 			logger.debug("doFillTargetItems");
-			final ListBoxModel items = new ListBoxModel();
+			final ListBoxModel listBoxItems = new ListBoxModel();
+			if (item == null) {
+				return listBoxItems;
+			}
+			if (!item.hasPermission(Item.CONFIGURE)) {
+				return listBoxItems.add("No items retrieved. " + RapidDeployConnectorProxy.INSUFFICIENT_PERMISSIONS_MESSAGE);
+			}
 			if (!rdProxy.getProjects(serverUrl, authenticationToken).isEmpty()) {
 				try {
 					final List<String> targets = rdProxy.getTargets(serverUrl, authenticationToken, project);
 					for (final String targetName : targets) {
 						if (!targetName.contains("Project [") && !targetName.contains("domainxml")) {
-							items.add(targetName);
+							listBoxItems.add(targetName);
 						}
 					}
 				} catch (final Exception e) {
 					logger.warn(e.getMessage());
 				}
 			}
-			return items;
+			return listBoxItems;
 		}
 
 		/** PACKAGE FIELD **/
-
+		@RequirePOST
 		public ComboBoxModel doFillPackageNameItems(@QueryParameter("serverUrl") final String serverUrl,
 				@QueryParameter("authenticationToken") final String authenticationToken, @QueryParameter("project") final String project,
-				@QueryParameter("target") final String target) {
+				@QueryParameter("target") final String target, @AncestorInPath Item item) {
 			logger.debug("doFillPackageNameItems");
-			final ComboBoxModel items = new ComboBoxModel();
+			final ComboBoxModel comboBoxItems = new ComboBoxModel();
+			if (item == null) {
+				return comboBoxItems;
+			}
+			if (!item.hasPermission(Item.CONFIGURE)) {
+				comboBoxItems.add("No items retrieved. " + RapidDeployConnectorProxy.INSUFFICIENT_PERMISSIONS_MESSAGE);
+				return comboBoxItems;
+			}
 			if (!rdProxy.getProjects(serverUrl, authenticationToken).isEmpty()) {
 				try {
-					items.add("LATEST");
+					comboBoxItems.add("LATEST");
 					final List<String> packageNames = rdProxy.getDeploymentPackages(serverUrl, authenticationToken, project, target);
 					for (final String packageName : packageNames) {
 						if (!"null".equals(packageName) && !packageName.startsWith("Deployment")) {
-							items.add(packageName);
+							comboBoxItems.add(packageName);
 						}
 					}
 				} catch (final Exception e) {
 					logger.warn(e.getMessage());
 				}
 			}
-			return items;
+			return comboBoxItems;
 		}
 	}
 }

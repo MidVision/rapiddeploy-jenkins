@@ -5,11 +5,11 @@
 	<j:set var="id" value="${h.generateId()}" />
 
 	<f:entry title="RapidDeploy server URL" field="serverUrl">
-		<f:textbox />
+		<f:textbox checkMethod="post" />
 	</f:entry>
 
 	<f:entry title="RapidDeploy authentication token" field="authenticationToken">
-		<f:password />
+		<f:password checkMethod="post" />
 	</f:entry>
 
 	<f:entry>
@@ -25,15 +25,15 @@
 	</f:entry>
 
 	<f:entry title="Job Plan" field="jobPlan">
-		<f:select id="${id}" />
+		<f:select id="${id}" checkMethod="post" />
 	</f:entry>
 
 	<f:entry title="Asynchronous job" field="asynchronousJob">
-		<f:checkbox />
+		<f:checkbox checkMethod="post" />
 	</f:entry>
 
 	<f:entry title="Show Full Logs" field="showFullLogs">
-		<f:checkbox />
+		<f:checkbox checkMethod="post" />
 	</f:entry>
 
 </j:jelly>

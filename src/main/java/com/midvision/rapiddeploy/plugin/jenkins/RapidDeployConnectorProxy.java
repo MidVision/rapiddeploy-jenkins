@@ -2,7 +2,11 @@ package com.midvision.rapiddeploy.plugin.jenkins;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,12 +20,19 @@ import org.apache.commons.logging.LogFactory;
 import com.midvision.rapiddeploy.connector.RapidDeployConnector;
 import com.midvision.rapiddeploy.plugin.jenkins.postbuildstep.RapidDeployPackageBuilder;
 
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 
 public class RapidDeployConnectorProxy {
 
 	private static final Log logger = LogFactory.getLog(RapidDeployPackageBuilder.class);
+
+	public static final String NOT_EMPTY_MESSAGE = "Please set a value for this field!";
+	public static final String NO_PROTOCOL_MESSAGE = "Please specify a protocol for the URL, e.g. \"http://\".";
+	public static final String CONNECTION_BAD_MESSAGE = "Unable to establish connection.";
+	public static final String WRONG_PROJECT_MESSAGE = "Wrong project selected, please reload the projects list.";
+	public static final String INSUFFICIENT_PERMISSIONS_MESSAGE = "Insufficient permissions to perform the check.";
 
 	private List<String> projects;
 	private List<String> jobPlans;
@@ -35,9 +46,9 @@ public class RapidDeployConnectorProxy {
 		this.newConnection = newConnection;
 	}
 
-	/*****************************/
-	/** PACKAGE CREATION METHOS **/
-	/*****************************/
+	/******************************/
+	/** PACKAGE CREATION METHODS **/
+	/******************************/
 
 	public static boolean performPackageBuild(final AbstractBuild<?, ?> build, final BuildListener listener, final String serverUrl,
 			final String authenticationToken, final String project, String packageName, final String archiveExtension) {
@@ -56,6 +67,7 @@ public class RapidDeployConnectorProxy {
 					false, true);
 			boolean success = true;
 			final String jobId = RapidDeployConnector.extractJobId(output);
+			listener.getLogger().println(">>>  Requested package creation [" + jobId + "] <<<");
 			if (jobId != null) {
 				listener.getLogger().println("Checking job status every 30 seconds...");
 				boolean runningJob = true;
@@ -102,9 +114,9 @@ public class RapidDeployConnectorProxy {
 		}
 	}
 
-	/***************************/
-	/** JOB DEPLOYMENT METHOS **/
-	/***************************/
+	/****************************/
+	/** JOB DEPLOYMENT METHODS **/
+	/****************************/
 
 	public static boolean performJobDeployment(final AbstractBuild<?, ?> build, final BuildListener listener, final String serverUrl,
 			final String authenticationToken, final String project, final String target, String packageName, final Boolean asynchronousJob) {
@@ -142,6 +154,7 @@ public class RapidDeployConnectorProxy {
 			if (!asynchronousJob) {
 				boolean success = true;
 				final String jobId = RapidDeployConnector.extractJobId(output);
+				listener.getLogger().println(">>>  Requested project deployment [" + jobId + "] <<<");
 				if (jobId != null) {
 					listener.getLogger().println("Checking job status every 30 seconds...");
 					boolean runningJob = true;
@@ -190,9 +203,9 @@ public class RapidDeployConnectorProxy {
 		}
 	}
 
-	/*************************/
-	/** JOB PLAN RUN METHOS **/
-	/*************************/
+	/**************************/
+	/** JOB PLAN RUN METHODS **/
+	/**************************/
 
 	public static boolean performJobPlanRun(final BuildListener listener, final String serverUrl, final String authenticationToken, final String jobPlan,
 			final Boolean asynchronousJob, final Boolean showFullLogs) {
@@ -209,6 +222,7 @@ public class RapidDeployConnectorProxy {
 				String jobDetails = "";
 				boolean success = true;
 				final String jobId = RapidDeployConnector.extractJobId(output);
+				listener.getLogger().println(">>>  Requested job plan deployment [" + jobId + "] <<<");
 				if (jobId != null) {
 					listener.getLogger().println("Checking job status every 30 seconds...");
 					boolean runningJob = true;
@@ -267,9 +281,9 @@ public class RapidDeployConnectorProxy {
 		}
 	}
 
-	/**********************/
-	/***** AUX METHOS *****/
-	/**********************/
+	/***********************/
+	/***** AUX METHODS *****/
+	/***********************/
 
 	private static String replaceParametersPlaceholders(String paramStr, final AbstractBuild<?, ?> build, final BuildListener listener) {
 		listener.getLogger().println("Replacing job parameters for '" + paramStr + "'");
@@ -312,9 +326,31 @@ public class RapidDeployConnectorProxy {
 		return paramStr;
 	}
 
-	/************************/
-	/***** PROXY METHOS *****/
-	/************************/
+	private Map<String, String> sortByJobPlanName(Map<String, String> unsortMap) {
+
+		// 1. Convert Map to List of Map
+		List<Entry<String, String>> list = new LinkedList<Map.Entry<String, String>>(unsortMap.entrySet());
+
+		// 2. Sort list with Collections.sort(), provide a custom Comparator
+		// Try switch the o1 o2 position for a different order
+		Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
+			public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
+				return (o1.getValue().substring(o1.getValue().indexOf("]") + 2)).compareTo(o2.getValue().substring(o2.getValue().indexOf("]") + 2));
+			}
+		});
+
+		// 3. Loop the sorted list and put it into a new insertion order Map LinkedHashMap
+		Map<String, String> sortedMap = new LinkedHashMap<String, String>();
+		for (Map.Entry<String, String> entry : list) {
+			sortedMap.put(entry.getKey(), entry.getValue());
+		}
+
+		return sortedMap;
+	}
+
+	/*************************/
+	/***** PROXY METHODS *****/
+	/*************************/
 
 	/** Method that caches the projects to ease the form validation **/
 	public List<String> getProjects(final String serverUrl, final String authenticationToken) {
@@ -367,7 +403,8 @@ public class RapidDeployConnectorProxy {
 				if (serverUrl != null && !"".equals(serverUrl) && authenticationToken != null && !"".equals(authenticationToken)) {
 					logger.debug("REQUEST TO WEB SERVICE GET JOB PLANS...");
 					final String jobPlansCallOutput = RapidDeployConnector.invokeRapidDeployJobPlans(authenticationToken, serverUrl);
-					final Map<String, String> jobPlansExtracted = RapidDeployConnector.extractJobPlansFromXml(jobPlansCallOutput);
+					Map<String, String> jobPlansExtracted = RapidDeployConnector.extractJobPlansFromXml(jobPlansCallOutput);
+					jobPlansExtracted = sortByJobPlanName(jobPlansExtracted);
 					for (final String jobPlanDesc : jobPlansExtracted.values()) {
 						jobPlans.add(jobPlanDesc);
 					}
@@ -400,7 +437,7 @@ public class RapidDeployConnectorProxy {
 			for (final String packageName : packageNames) {
 				if (!"null".equals(packageName) && !packageName.startsWith("Deployment")) {
 					sb.append("<tr><td class=\"setting-main\">");
-					sb.append(packageName);
+					sb.append(Util.escape(packageName));
 					sb.append("</td></tr>");
 					index++;
 					if (index >= limit) {

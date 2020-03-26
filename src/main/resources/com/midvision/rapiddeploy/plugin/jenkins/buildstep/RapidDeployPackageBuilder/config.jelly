@@ -5,11 +5,11 @@
 	<j:set var="id" value="${h.generateId()}" />
 
 	<f:entry title="RapidDeploy server URL" field="serverUrl">
-		<f:textbox />
+		<f:textbox checkMethod="post" />
 	</f:entry>
 
 	<f:entry title="RapidDeploy authentication token" field="authenticationToken">
-		<f:password />
+		<f:password checkMethod="post" />
 	</f:entry>
 
 	<f:entry>
@@ -25,7 +25,7 @@
 	</f:entry>
 
 	<f:entry title="Project" field="project">
-		<f:select id="${id}" />
+		<f:select id="${id}" checkMethod="post" />
 	</f:entry>
 
 	<f:validateButton title="Show recent packages"
@@ -35,12 +35,12 @@
 	<f:optionalBlock field="enableCustomPackageName" title="Use custom package name"
 		inline="true">
 		<f:entry title="Package name" name="packageName" field="packageName">
-			<f:textbox />
+			<f:textbox checkMethod="post" />
 		</f:entry>
 	</f:optionalBlock>
 
 	<f:entry title="Archive extension" field="archiveExtension">
-		<f:select />
+		<f:select checkMethod="post" />
 	</f:entry>
 
 </j:jelly>
