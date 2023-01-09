@@ -32,7 +32,11 @@
 		<f:checkbox checkMethod="post" />
 	</f:entry>
 
-	<f:entry title="Show Full Logs" field="showFullLogs">
+	<f:entry title="Show individual logs" field="showIndividualLogs">
+		<f:checkbox checkMethod="post" />
+	</f:entry>
+
+	<f:entry title="Show full log" field="showFullLog">
 		<f:checkbox checkMethod="post" />
 	</f:entry>
 

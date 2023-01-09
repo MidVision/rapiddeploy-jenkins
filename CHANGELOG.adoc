@@ -1,0 +1,73 @@
+= Changelog
+
+== 4.0
+_March, 2019_
+
+* All the references to the term “Environment” or “Logical environment”
+have been replaced by the term “Target” to become properly consistent
+with the new terminology of _RapidDeploy 5_.
+
+* All the functionality that was duplicated on the Jenkins build steps and
+post-build actions, especially the calls to the
+https://github.com/MidVision/rapiddeploy-connector[_RapidDeploy_ connector],
+was fully refactored into a single class.
+
+* New functionality for the https://jenkins.io/doc/book/pipeline[Jenkins
+Pipeline] was included in the plugin in the form of 3 new pipeline
+steps:
+
+** *_rdPackageBuild_*: for _RapidDeploy_ deployment package creation.
+** *_rdProjectDeploy_*: for _RapidDeploy_ project deployment.
+** *_rdJobPlanRun_*: for _RapidDeploy_ job plan run.
+
+== 3.10
+_March, 2017_
+
+* Added new feature that provides the ability to pass data dictionary
+values to a _RapidDeploy_ deployment as Jenkins parameters in a parametrized build.
+Data dictionary parameters need to be specify like data dictionary keys, i.e., `@@PARAMETER_NAME@@`.
+In _RapidDeploy_ a new package will be created with the overridden parameter(s) injected.
+
+** *This feature is available from _RapidDeploy 4.2.2_ onwards.*
+
+== 3.9
+_December, 2016_
+
+* Added new _RapidDeploy_ job plan runner as a Build and Post-build step to
+be able to run job plans from _RapidDeploy_.
+
+== 3.8
+_November, 2016_
+
+* Added support for parametrized builds. Now, to select a package version
+to deploy on _RapidDeploy_ there is the option to use a Jenkins parameter.
+
+== 3.2
+_September, 2014_
+
+* Support all SSL certifications (works with untrusted https URLs too). 
+
+* Change fields from list to combobox, which will autocomplete the
+project/environment/package names when typing, with the ability to
+manually enter fields.
+
+== 3.1
+_March, 2014_
+
+* Added asynchronous execution option for project deploy steps.
+
+== 3.0
+_March, 2014_
+
+* Added package build step.
+
+== 2.1
+_September, 2013_
+
+* Added dynamic lists for project deploy fields. Project deploy step can
+be invoked as either a buildstep and postbuildstep.
+
+== 1.0
+_July, 2013_
+
+* Added initial version of project deploy postbuild step.

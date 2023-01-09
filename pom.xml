@@ -3,21 +3,21 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>2.3</version>
+		<version>4.12</version>
 	</parent>
 
 	<name>RapidDeploy Plugin</name>
 	<description>Allows Jenkins users to use the RapidDeploy functionality on a Jenkins job or pipeline.</description>
 	<artifactId>rapiddeploy-jenkins</artifactId>
-	<version>4.4-SNAPSHOT</version>
+	<version>4.10-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 
-	<url>https://wiki.jenkins-ci.org/display/JENKINS/RapidDeploy+Plugin</url>
+	<url>https://github.com/jenkinsci/rapiddeploy-plugin</url>
 
 	<developers>
 		<developer>
 			<id>MidVision</id>
-			<name>MidVision</name>
+			<name>MidVision Limited</name>
 			<email>support@midvision.com</email>
 		</developer>
 	</developers>
@@ -30,16 +30,16 @@
 	</scm>
 
 	<properties>
-		<workflow.version>2.65</workflow.version>
-<!-- 		<jenkins.version>2.0</jenkins.version> -->
-		<jenkins-test-harness.version>2.48</jenkins-test-harness.version>
+		<jenkins.version>2.332.3</jenkins.version>
+		<java.level>8</java.level>
+		<workflow.version>2725.v7b_c717eb_12ce</workflow.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.midvision.plugins</groupId>
 			<artifactId>rapiddeploy-connector</artifactId>
-			<version>1.10</version>
+			<version>1.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -48,40 +48,6 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.6</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.maven.wagon</groupId>
-						<artifactId>wagon-http</artifactId>
-						<version>2.10</version>
-						<type>jar</type>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-	</build>
-
-	<!-- This is necessary because https://maven.jenkins-ci.org does't work 
-		anymore, so we need to overwrite the repositories as per Jenkins documentation. -->
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>maven.jenkins-ci.org</id>
-			<url>https://repo.jenkins-ci.org/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>maven.jenkins-ci.org</id>
-			<url>https://repo.jenkins-ci.org/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
-	<!-- Get every artifact through repo.jenkins-ci.org, which proxies all the 
-		artifacts that we need. -->
 	<repositories>
 		<repository>
 			<id>repo.jenkins-ci.org</id>
@@ -89,7 +55,7 @@
 		</repository>
 		<repository>
 			<id>MidVision</id>
-			<url>http://www.download.midvision.com/content/repositories/Community_release/</url>
+			<url>https://plugins.midvision.com/downloads/releases</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
@@ -99,3 +65,4 @@
 		</pluginRepository>
 	</pluginRepositories>
 </project>
+

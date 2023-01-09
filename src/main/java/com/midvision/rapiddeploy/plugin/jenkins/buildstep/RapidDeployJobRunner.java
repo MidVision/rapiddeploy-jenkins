@@ -35,12 +35,13 @@ public class RapidDeployJobRunner extends Builder {
 	private final String target;
 	private final String packageName;
 	private final Boolean asynchronousJob;
+	private final Boolean showFullLog;
 
 	private static final Log logger = LogFactory.getLog(RapidDeployJobRunner.class);
 
 	@DataBoundConstructor
 	public RapidDeployJobRunner(final String serverUrl, final String authenticationToken, final String project, final String target, final String packageName,
-			final Boolean asynchronousJob) {
+			final Boolean asynchronousJob, final Boolean showFullLog) {
 		super();
 		this.serverUrl = serverUrl;
 		this.authenticationToken = authenticationToken;
@@ -48,11 +49,13 @@ public class RapidDeployJobRunner extends Builder {
 		this.packageName = packageName;
 		this.project = project;
 		this.asynchronousJob = asynchronousJob;
+		this.showFullLog = showFullLog;
 	}
 
 	@Override
 	public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) {
-		return RapidDeployConnectorProxy.performJobDeployment(build, listener, serverUrl, authenticationToken, project, target, packageName, asynchronousJob);
+		return RapidDeployConnectorProxy.performJobDeployment(build, listener, serverUrl, authenticationToken, project, target, packageName, asynchronousJob,
+				showFullLog);
 	}
 
 	public String getProject() {
@@ -77,6 +80,10 @@ public class RapidDeployJobRunner extends Builder {
 
 	public Boolean getAsynchronousJob() {
 		return asynchronousJob;
+	}
+
+	public Boolean getShowFullLog() {
+		return showFullLog;
 	}
 
 	public BuildStepMonitor getRequiredMonitorService() {
@@ -114,7 +121,7 @@ public class RapidDeployJobRunner extends Builder {
 
 		/** SERVER URL FIELD **/
 		@RequirePOST
-		public FormValidation doCheckServerUrl(@QueryParameter final String value, @AncestorInPath Item item) throws IOException, ServletException {
+		public FormValidation doCheckServerUrl(@QueryParameter final String value, @AncestorInPath final Item item) throws IOException, ServletException {
 			logger.debug("doCheckServerUrl");
 			if (item == null) {
 				return FormValidation.ok();
@@ -133,7 +140,7 @@ public class RapidDeployJobRunner extends Builder {
 
 		/** AUTHENTICATION TOKEN FIELD **/
 		@RequirePOST
-		public FormValidation doCheckAuthenticationToken(@QueryParameter final String value, @AncestorInPath Item item) throws IOException, ServletException {
+		public FormValidation doCheckAuthenticationToken(@QueryParameter final String value, @AncestorInPath final Item item) throws IOException, ServletException {
 			logger.debug("doCheckAuthenticationToken");
 			if (item == null) {
 				return FormValidation.ok();
@@ -151,7 +158,7 @@ public class RapidDeployJobRunner extends Builder {
 		/** LOAD PROJECTS BUTTON **/
 		@RequirePOST
 		public FormValidation doLoadProjects(@QueryParameter("serverUrl") final String serverUrl,
-				@QueryParameter("authenticationToken") final String authenticationToken, @AncestorInPath Item item) throws IOException, ServletException {
+				@QueryParameter("authenticationToken") final String authenticationToken, @AncestorInPath final Item item) throws IOException, ServletException {
 			logger.debug("doLoadProjects");
 			if (item == null) {
 				return FormValidation.ok();
@@ -169,7 +176,7 @@ public class RapidDeployJobRunner extends Builder {
 		/** PROJECT FIELD **/
 		@RequirePOST
 		public ListBoxModel doFillProjectItems(@QueryParameter("serverUrl") final String serverUrl,
-				@QueryParameter("authenticationToken") final String authenticationToken, @AncestorInPath Item item) {
+				@QueryParameter("authenticationToken") final String authenticationToken, @AncestorInPath final Item item) {
 			logger.debug("doFillProjectItems");
 			final ListBoxModel listBoxItems = new ListBoxModel();
 			if (item == null) {
@@ -188,7 +195,7 @@ public class RapidDeployJobRunner extends Builder {
 		@RequirePOST
 		public ListBoxModel doFillTargetItems(@QueryParameter("serverUrl") final String serverUrl,
 				@QueryParameter("authenticationToken") final String authenticationToken, @QueryParameter("project") final String project,
-				@AncestorInPath Item item) {
+				@AncestorInPath final Item item) {
 			logger.debug("doFillTargetItems");
 			final ListBoxModel listBoxItems = new ListBoxModel();
 			if (item == null) {
@@ -216,7 +223,7 @@ public class RapidDeployJobRunner extends Builder {
 		@RequirePOST
 		public ComboBoxModel doFillPackageNameItems(@QueryParameter("serverUrl") final String serverUrl,
 				@QueryParameter("authenticationToken") final String authenticationToken, @QueryParameter("project") final String project,
-				@QueryParameter("target") final String target, @AncestorInPath Item item) {
+				@QueryParameter("target") final String target, @AncestorInPath final Item item) {
 			logger.debug("doFillPackageNameItems");
 			final ComboBoxModel comboBoxItems = new ComboBoxModel();
 			if (item == null) {
