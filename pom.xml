@@ -32,7 +32,7 @@
 	<properties>
 		<jenkins.version>2.332.3</jenkins.version>
 		<java.level>8</java.level>
-		<workflow.version>2725.v7b_c717eb_12ce</workflow.version>
+		<workflow.version>2803.v1a_f77ffcc773</workflow.version>
 	</properties>
 
 	<dependencies>
